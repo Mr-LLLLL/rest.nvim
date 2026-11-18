@@ -35,7 +35,7 @@ CLI.
 - Set custom pre-request and post-request hooks to dynamically interact with the data
 - Easily set environment variables based on the response to re-use the data later
 - Tree-sitter based parsing and syntax highlighting for speed and perfect accuracy
-- Format response body with native `gq` command
+- Format response body with native `gq` command, falling back to `jq` for JSON responses
 - Possibility of using dynamic/environment variables and Lua scripting in HTTP files
 - Save received cookies and load them automatically
 
@@ -134,7 +134,7 @@ local default_config = {
         hooks = {
             ---@type boolean Decode the request URL segments on response UI to improve readability
             decode_url = true,
-            ---@type boolean Format the response body using `gq` command
+            ---@type boolean Format the response body using `gq` command, falling back to `jq` for JSON
             format = true,
         },
     },

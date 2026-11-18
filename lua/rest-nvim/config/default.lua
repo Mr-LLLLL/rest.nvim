@@ -28,7 +28,7 @@ local default_config = {
         hooks = {
             ---@type boolean Decode the request URL segments on response UI to improve readability
             decode_url = true,
-            ---@type boolean Format the response body using `gq` command
+            ---@type boolean Format the response body using `gq` command, falling back to `jq` for JSON
             format = true,
         },
     },

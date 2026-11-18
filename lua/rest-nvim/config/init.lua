@@ -14,7 +14,7 @@
 ---@brief ]]
 
 ---@type rest.Config
-local config
+local config = {}
 
 ---@tag vim.g.rest_nvim
 ---@tag g:rest_nvim
@@ -52,6 +52,8 @@ local config
 --- Decode url segments on response UI too improve readability (Default: `true`)
 ---@field decode_url? boolean
 --- Format the response body with |'formatexpr'| or |'formatprg'| (Default: `true`)
+--- When the response filetype doesn't provide either option, rest.nvim falls back
+--- to a built-in formatter (currently `jq` for JSON responses).
 --- NOTE: |vim.lsp.formatexpr()| won't work (see
 --- <https://github.com/rest-nvim/rest.nvim/issues/414#issuecomment-2308910953>)
 ---@field format? boolean
@@ -128,14 +130,45 @@ vim.g.rest_nvim = vim.g.rest_nvim
 local default_config = require("rest-nvim.config.default")
 
 local check = require("rest-nvim.config.check")
-local opts = vim.g.rest_nvim or {}
-config = vim.tbl_deep_extend("force", default_config, opts)
----@cast config rest.Config
-local ok, err = check.validate(config)
 
-if not ok then
-    ---@cast err string
-    vim.notify(err, vim.log.levels.ERROR, { title = "rest.nvim" })
+---Merge the defaults with `vim.g.rest_nvim` and update the config table in place
+---Updating in place matters: modules do `local config = require("rest-nvim.config")`
+---at load time, so they must see the new values after a reload.
+---@return rest.Config
+local function resolve()
+    local opts = vim.g.rest_nvim or {}
+    local cfg = vim.tbl_deep_extend("force", default_config, opts)
+    ---@cast cfg rest.Config
+    local ok, err = check.validate(cfg)
+
+    if not ok then
+        ---@cast err string
+        vim.notify(err, vim.log.levels.ERROR, { title = "rest.nvim" })
+    end
+
+    for k in pairs(config) do
+        if k ~= "reload" then
+            config[k] = nil
+        end
+    end
+
+    for k, v in pairs(cfg) do
+        config[k] = v
+    end
+
+    return config
 end
+
+---Reload the configuration from `vim.g.rest_nvim`
+---Useful when the options are set after this module has been loaded. That happens
+---when rest.nvim is lazy-loaded on the `http` filetype: the ftplugin loads this
+---module before the plugin manager runs the user's `config`/`setup` callback.
+---@return rest.Config
+function config.reload()
+    return resolve()
+end
+
+-- Keep the previous behavior of validating the configuration as soon as it is loaded
+resolve()
 
 return config

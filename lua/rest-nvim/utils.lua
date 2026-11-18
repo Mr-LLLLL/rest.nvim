@@ -7,6 +7,7 @@
 ---@brief ]]
 
 local logger = require("rest-nvim.logger")
+local response_formatter = require("rest-nvim.formatter")
 -- local config = require("rest-nvim.config")
 
 local utils = {}
@@ -320,6 +321,7 @@ function utils.gq_lines(lines, filetype)
         local msg = ("Can't set filetype to '%s' (%s). Formatting is canceled"):format(filetype, errmsg)
         logger.warn(msg)
         vim.notify(msg, vim.log.levels.WARN, { title = "rest.nvim" })
+        vim.api.nvim_buf_delete(format_buf, { force = true })
         return lines, false
     end
     vim.api.nvim_buf_set_lines(format_buf, 0, -1, false, lines)
@@ -342,8 +344,10 @@ function utils.gq_lines(lines, filetype)
     elseif formatprg ~= "" then
         logger.debug(("formatting %s filetype with formatprg=%s"):format(filetype, formatprg))
     else
-        logger.debug(("can't find formatexpr or formatprg for %s filetype. Formatting is canceled"):format(filetype))
-        return lines, false
+        logger.debug(("can't find formatexpr or formatprg for %s filetype. Trying built-in formatter"):format(filetype))
+        local formatted, did_format = response_formatter.format(lines, filetype)
+        vim.api.nvim_buf_delete(format_buf, { force = true })
+        return formatted, did_format
     end
     vim.api.nvim_buf_call(format_buf, function()
         -- HACK: dirty fix for neovim/neovim#30593

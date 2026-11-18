@@ -17,6 +17,10 @@ local rest = {}
 function rest.setup(user_configs)
     -- Set up rest.nvim configurations
     vim.g.rest_nvim = user_configs or {}
+    -- The configuration module may have been loaded before this function runs (for
+    -- example by the `http` ftplugin, which loads `rest-nvim.dotenv` and therefore
+    -- `rest-nvim.config`). Reload it so late options are actually applied.
+    require("rest-nvim.config").reload()
 end
 
 return rest

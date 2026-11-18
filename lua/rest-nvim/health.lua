@@ -60,13 +60,27 @@ local function formatter_health()
     for _, ft in ipairs({ "json", "xml", "html" }) do
         local formatexpr = vim.api.nvim_get_option_value("formatexpr", { filetype = ft })
         local formatprg = vim.api.nvim_get_option_value("formatprg", { filetype = ft })
-        if formatexpr == "" and formatprg == "" then
-            vim.health.warn("Options 'formatexpr' or 'formatprg' are not set for " .. ft .. " filetype")
+        if formatexpr ~= "" then
+            vim.health.ok(("Option 'formatexpr' is set to `%s` for %s filetype"):format(formatexpr, ft))
+        elseif formatprg ~= "" then
+            vim.health.ok(("Option 'formatprg' is set to `%s` for %s filetype"):format(formatprg, ft))
         else
-            if formatexpr ~= "" then
-                vim.health.ok(("Option 'formatexpr' is set to `%s` for %s filetype"):format(formatexpr, ft))
+            -- rest.nvim has a built-in fallback for some filetypes
+            local fallback = require("rest-nvim.formatter").get(ft)
+            if fallback and vim.fn.executable(fallback[1]) == 1 then
+                vim.health.ok(
+                    ("No 'formatexpr'/'formatprg' for %s, using built-in formatter `%s`"):format(
+                        ft,
+                        table.concat(fallback, " ")
+                    )
+                )
+            elseif fallback then
+                vim.health.warn(
+                    ("Options 'formatexpr' or 'formatprg' are not set for %s filetype"):format(ft),
+                    ("Install `%s` or configure a formatter for the filetype"):format(fallback[1])
+                )
             else
-                vim.health.ok(("Option 'formatprg' is set to `%s` for %s filetype"):format(formatexpr, ft))
+                vim.health.warn("Options 'formatexpr' or 'formatprg' are not set for " .. ft .. " filetype")
             end
         end
     end
