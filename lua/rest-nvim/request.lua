@@ -63,7 +63,7 @@ local function run_request(req)
     ui.update({ request = req })
     local ok, res = pcall(client.request(req).wait)
     if not ok then
-        logger.error("request failed")
+        logger.error("request failed: " .. tostring(res))
         vim.notify("request failed. See `:Rest logs` for more info", vim.log.levels.ERROR, { title = "rest.nvim" })
         return
     end
@@ -128,7 +128,12 @@ function M.run_last()
         vim.notify("No last request found", vim.log.levels.WARN, { title = "rest.nvim" })
         return false
     end
-    run_request(req)
+    -- NOTE: `run_request()` awaits the client future, so it must run inside a
+    -- coroutine. `:Rest last` calls this function from a regular command
+    -- context, unlike `M.run()` which wraps its body in `nio.run()`.
+    nio.run(function()
+        run_request(req)
+    end)
 end
 
 function M.last_request()
