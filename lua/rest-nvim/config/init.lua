@@ -117,6 +117,10 @@ local config = {}
 ---@field prev? string
 --- Mapping for cycle to next result pane (Default: `"L"`)
 ---@field next? string
+--- Mapping to quit the result window (Default: `"q"`)
+---@field quit? string
+--- Mapping to open the result window help (Default: `"g?"`)
+---@field help? string
 
 ---@class rest.Opts.Highlight
 --- Enable highlight-on-request (Default: `true`)

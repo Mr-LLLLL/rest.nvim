@@ -181,11 +181,12 @@ local panes = {
     },
 }
 
+local help_key = config.ui.keybinds.help:gsub("%%", "%%%%")
 local winbar = "%#Normal# %{%v:lua.require('rest-nvim.ui.panes').winbar()%}"
 winbar = winbar .. "%=%<"
 winbar = winbar .. "%{%v:lua.require('rest-nvim.ui.result').stat_winbar()%}"
 winbar = winbar .. " %#RestText#|%#Normal# "
-winbar = winbar .. "%#RestText#Press %#Keyword#?%#RestText# for help%#Normal# "
+winbar = winbar .. "%#RestText#Press %#Keyword#" .. help_key .. "%#RestText# for help%#Normal# "
 
 ---Winbar component showing response statistics
 ---@return string
@@ -217,13 +218,33 @@ local group = paneui.create_pane_group("rest_nvim_result", panes, {
         vim.keymap.set("n", config.ui.keybinds.next, function()
             self.group:cycle(1)
         end, { buffer = self.bufnr })
-        vim.keymap.set("n", "?", help.open, { buffer = self.bufnr })
+        vim.keymap.set("n", config.ui.keybinds.help, help.open, {
+            buffer = self.bufnr,
+            desc = "rest.nvim: open result window help",
+        })
+        vim.keymap.set("n", config.ui.keybinds.quit, ui.close, {
+            buffer = self.bufnr,
+            desc = "rest.nvim: close result window",
+        })
         vim.bo[self.bufnr].filetype = "rest_nvim_result"
         if config.ui.winbar then
             utils.nvim_lazy_set_wo(self.bufnr, "winbar", winbar)
         end
     end,
 })
+
+---Close the window showing the result panes
+function ui.close()
+    if #vim.api.nvim_tabpage_list_wins(0) > 1 then
+        vim.api.nvim_win_close(0, false)
+    else
+        vim.notify(
+            "Can't close the last window, use `:q` to quit Neovim",
+            vim.log.levels.WARN,
+            { title = "rest.nvim" }
+        )
+    end
+end
 
 ---Check if UI window is shown in current tabpage
 ---@return boolean

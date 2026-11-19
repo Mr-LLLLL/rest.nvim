@@ -35,7 +35,7 @@ local function get_or_create_buf()
         vim.api.nvim_buf_set_name(new_bufnr, tmp_name)
         vim.api.nvim_set_option_value("ft", "markdown", { buf = new_bufnr })
         vim.api.nvim_set_option_value("buftype", "nofile", { buf = new_bufnr })
-        vim.keymap.set("n", "q", help.close, {
+        vim.keymap.set("n", config.ui.keybinds.quit, help.close, {
             desc = "Close rest.nvim request results help window",
             buffer = new_bufnr,
         })
@@ -45,9 +45,10 @@ local function get_or_create_buf()
             "**Keybinds**:",
             "  - `" .. keybinds.prev .. "`: go to previous pane",
             "  - `" .. keybinds.next .. "`: go to next pane",
-            "  - `q`: close results window",
+            "  - `" .. keybinds.help .. "`: open this help window",
+            "  - `" .. keybinds.quit .. "`: close results window",
             "",
-            "**Press `q` to close this help window**",
+            "**Press `" .. keybinds.quit .. "` to close this help window**",
         }
         set_lines(new_bufnr, buf_content)
 

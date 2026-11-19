@@ -66,6 +66,8 @@ function check.validate(cfg)
         ["ui.keybinds"] = { cfg.ui.keybinds, "table" },
         ["ui.keybinds.prev"] = { cfg.ui.keybinds.prev, "string" },
         ["ui.keybinds.next"] = { cfg.ui.keybinds.next, "string" },
+        ["ui.keybinds.quit"] = { cfg.ui.keybinds.quit, "string" },
+        ["ui.keybinds.help"] = { cfg.ui.keybinds.help, "string" },
         highlight = { cfg.highlight, "table" },
         ["highlight.enable"] = { cfg.highlight.enable, "boolean" },
         ["highlight.timeout"] = { cfg.highlight.timeout, "number" },

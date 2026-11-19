@@ -89,6 +89,10 @@ local default_config = {
             prev = "H",
             ---@type string Mapping for cycle to next result pane
             next = "L",
+            ---@type string Mapping to quit the result window
+            quit = "q",
+            ---@type string Mapping to open the result window help
+            help = "g?",
         },
     },
     ---@class rest.Config.Highlight

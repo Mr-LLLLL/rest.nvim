@@ -240,6 +240,8 @@ rest.Opts.UI.Keybinds                                    *rest.Opts.UI.Keybinds*
     Fields: ~
         {prev?}  (string)   Mapping for cycle to previous result pane (Default: `"H"`)
         {next?}  (string)   Mapping for cycle to next result pane (Default: `"L"`)
+        {quit?}  (string)   Mapping to quit the result window (Default: `"q"`)
+        {help?}  (string)   Mapping to open the result window help (Default: `"g?"`)
 
 
 rest.Opts.Highlight                                        *rest.Opts.Highlight*
